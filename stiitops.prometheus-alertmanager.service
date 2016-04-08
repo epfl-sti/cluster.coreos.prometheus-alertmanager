@@ -1,0 +1,15 @@
+[Unit]
+Description=Prometheus AlertManager service
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/bin/sh -c 'docker rm -f %n 2>/dev/null || true'
+ExecStartPre=/usr/bin/docker pull registry.service.consul:5000/cluster.coreos.prometheus-alertmanager:latest
+ExecStart=/bin/sh -c 'docker run --name %n -p 9093:9093  registry.service.consul:5000/cluster.coreos.prometheus-alertmanager -config.file=/etc/prometheus/alertmanager.conf'
+ExecStop=/usr/bin/docker rm -f %n
+RestartSec=5s
+Restart=always
+
+[X-Fleet]
+MachineOf=stiitops.prometheus.service
